@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style type="text/css">
+    body{
+        background-color: #F5F5F5;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    #resetButton {
+    display: block;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#resetButton:hover {
+    background-color: #45a049;
+}
+    .data-container{
+        display: flex;
+        justify-content: space-between;
+        width: 50%;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #FFF;
+        box-shadow: 0 2px 20px rgba(0, 0, 0,0.1);
+        border-radius: 10px;
+    }
+
+    .data-item{
+        text-align: center;
+    }
+
+    .data-item h2{
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .data-item p{
+        font-size: 48px;
+        font-weight: bold;
+        color: #6EB7FF;
+    }
+
+    .data-head{
+        margin: auto;
+        width: 50%;
+        text-align: center;
+        font-size: 45px;
+        font-weight: bold;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #FFF;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+    }
+
+    /* Slide switch styles */
+    .slide-switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .slide-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: 34px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: 100%;
+    }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(26px);
+        -ms-transform: translateX(26px);
+        transform: translateX(26px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    /* Chart container */
+    #energyChartContainer {
+        width: 50%;
+        margin: 50px auto;
+        padding: 20px;
+        background-color: #FFF;
+        box-shadow: 0 2px 20px rgba(0, 0, 0,0.1);
+        border-radius: 10px;
+    }
+
+    #energyChartCanvas {
+        border: 2px solid #6EB7FF;
+        border-radius: 10px;
+    }
+</style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web App</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mediaqueries.css">
+    <style>
+        /* Insert the CSS styles from the provided code here */
+    </style>
+</head>
+<body>
+    <nav id="desktop-nav">
+        <div class="logo">Paolo Satuito</div>
+        <div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#application">Application</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </div>
+    </nav>
+    <nav id="hamburger-nav">
+        <div class="logo">John Doe</div>
+        <div class="hamburger-menu">
+            <div class="hamburger-icon" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="menu-links">
+                <li><a href="#home" onclick="toggleMenu()">Home</a></li>
+                <li><a href="#application" onclick="toggleMenu()">Application</a></li>
+                <li><a href="#about" onclick="toggleMenu()">About</a></li>
+            </div>
+        </div>
+    </nav>
+    <section id="home">
+        <!-- Home content here -->
+    </section>
+    <section id="application">
+     <div class="data-head">VOLCHECK Smart Outlet</div>
+
+    <div class="data-container">
+        <div class="data-item">
+            <h2>Voltage</h2>
+            <p class="value" id="voltage">Loading...</p>
+        </div>
+        <div class="data-item">
+            <h2>Energy</h2>
+            <p class="value" id="energy">Loading...</p>
+        </div>
+    </div>
+
+    <div class="data-container">
+        <label class="slide-switch">
+            <input type="checkbox" id="ledSwitch" onchange="updateLEDState()">
+            <span class="slider round"></span>
+        </label>
+        <label for="ledSwitch">BUTTON</label>
+    </div>
+
+
+   
+    <button id="resetButton" onclick="resetData()">Reset Data</button>
+
+    <!-- New table for Voltage Fluctuation Monitor -->
+    <div class="data-container">
+        <table class="voltage-table">
+            <caption>Voltage Fluctuation Monitor</caption>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Voltage (V)</th>
+                </tr>
+            </thead>
+            <tbody id="voltageFluctuationTable">
+                <!-- Table rows will be added dynamically via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="energyChartContainer">
+        <canvas id="energyChartCanvas" width="400" height="200"></canvas>
+    </div>
+   
+    </section>
+
+    <section id="about">
+        <!-- About content here -->
+    </section>
+    <footer>
+        <nav>
+            <div class="nav-links-container">
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#application">Application</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </div>
+        </nav>
+        <p>Copyright &#169; 2024 Paolo Simeon Satuito. </p>
+    </footer>
+    <script src="script.js"></script>
+    
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Insert the JavaScript code from the provided code here
+          // Your web app's Firebase configuration here (Do not use the existing configuration)
+    var firebaseConfig = {
+        apiKey: "AIzaSyAzceWGaVeJkB9xU3iMQ9Ym1LcLTgXIXHQ",
+        authDomain: "volcheck-ccb7b.firebaseapp.com",
+        databaseURL: "https://volcheck-ccb7b-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "volcheck-ccb7b",
+        storageBucket: "volcheck-ccb7b.appspot.com",
+        messagingSenderId: "16950687239",
+        appId: "1:16950687239:web:6509562ebe5b02a2d1dca2"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // getting reference to the database
+    var database = firebase.database();
+
+
+    //getting reference to the data we want
+    var dataRef1 = database.ref('VOLCHECK/Voltage');
+    var dataRef2 = database.ref('VOLCHECK/Energy');
+    var ledRef = database.ref('led/state');
+
+    // Array to store energy readings
+   /* var energyReadings = [];
+    var timeLabels = []; */
+// Initialize energy readings and time labels from localStorage if available
+var energyReadings = JSON.parse(localStorage.getItem('energyReadings')) || [];
+var timeLabels = JSON.parse(localStorage.getItem('timeLabels')) || [];
+   // Chart initialization
+var ctx = document.getElementById('energyChartCanvas').getContext('2d');
+var energyChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: timeLabels,
+        datasets: [{
+            label: 'Energy (kWh)',
+            data: energyReadings,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        },
+        elements: {
+            line: {
+                tension: 0
+            }
+        },
+        legend: {
+            display: true
+        },
+        title: {
+            display: true,
+            text: 'Energy Consumption Over Time'
+        }
+    }
+});
+
+   // Function to update energy readings and chart
+function updateEnergyChart(time, energy) {
+    energyReadings.push(energy.toFixed(3));
+    timeLabels.push(time);
+    energyChart.update();
+
+    // Update local storage
+    localStorage.setItem('energyReadings', JSON.stringify(energyReadings));
+    localStorage.setItem('timeLabels', JSON.stringify(timeLabels));
+}
+
+   // Fetch the data and update the chart
+dataRef2.on('value', function(getdata2){
+    var kwh = getdata2.val().toFixed(3);
+    var currentTime = new Date().toLocaleTimeString();
+    updateEnergyChart(currentTime, parseFloat(kwh));
+    document.getElementById('energy').innerHTML = kwh + "kWh";
+});
+
+    // Function to update voltage reading
+    dataRef1.on('value', function(getdata1){
+        var volt = getdata1.val().toFixed(2);
+        document.getElementById('voltage').innerHTML = volt + "V";
+    });
+
+    // Function to update LED state when switch changes
+    function updateLEDState() {
+        var ledSwitch = document.getElementById("ledSwitch");
+        ledRef.set(ledSwitch.checked ? 1 : 0);
+    }
+    // Function to update voltage reading
+dataRef1.on('value', function(getdata1){
+  var volt = getdata1.val().toFixed(2);
+  document.getElementById('voltage').innerHTML = volt + "V";
+
+  // Check if voltage is less than 220V
+  if(parseFloat(volt) < 220) {
+      // Add a new row to the table
+      var table = document.getElementById('voltageFluctuationTable');
+      var currentTime = new Date().toLocaleTimeString();
+      var currentDate = new Date().toLocaleDateString();
+      var newRow = table.insertRow();
+      newRow.innerHTML = '<td>' + currentDate + '</td><td>' + currentTime + '</td><td>' + volt + '</td>';
+      newRow.classList.add('voltage-low');
+  }
+});
+// Function to update voltage reading
+dataRef1.on('value', function(getdata1){
+    var volt = getdata1.val().toFixed(2);
+    document.getElementById('voltage').innerHTML = volt + "V";
+
+    // Check if voltage is less than 220V
+    if(parseFloat(volt) < 220) {
+        // Add a new row to the table
+        var table = document.getElementById('voltageFluctuationTable');
+        var currentTime = new Date().toLocaleTimeString();
+        var currentDate = new Date().toLocaleDateString();
+        var newRow = table.insertRow();
+        newRow.innerHTML = '<td>' + currentDate + '</td><td>' + currentTime + '</td><td>' + volt + '</td>';
+        newRow.classList.add('voltage-low');
+
+        // Save the voltage fluctuation data to localStorage
+        var voltageFluctuations = JSON.parse(localStorage.getItem('voltageFluctuations')) || [];
+        voltageFluctuations.push({ date: currentDate, time: currentTime, voltage: parseFloat(volt) });
+        localStorage.setItem('voltageFluctuations', JSON.stringify(voltageFluctuations));
+    }
+});
+
+// Function to load voltage fluctuation data from localStorage on page load
+window.onload = function() {
+    var voltageFluctuations = JSON.parse(localStorage.getItem('voltageFluctuations')) || [];
+    var table = document.getElementById('voltageFluctuationTable');
+    voltageFluctuations.forEach(function(data) {
+        var newRow = table.insertRow();
+        newRow.innerHTML = '<td>' + data.date + '</td><td>' + data.time + '</td><td>' + data.voltage.toFixed(2) + '</td>';
+        newRow.classList.add('voltage-low');
+    });
+
+    // Load energy chart data from local storage
+    energyChart.data.labels = timeLabels;
+    energyChart.data.datasets[0].data = energyReadings;
+    energyChart.update();
+};
+function resetData() {
+    // Clear voltage fluctuation table
+    var table = document.getElementById('voltageFluctuationTable');
+    table.innerHTML = ''; // Clearing all table contents
+
+    // Clear voltage fluctuation data from localStorage
+    localStorage.removeItem('voltageFluctuations');
+
+    // Clear energy chart data
+    energyReadings = [];
+    timeLabels = [];
+    energyChart.data.labels = timeLabels;
+    energyChart.data.datasets[0].data = energyReadings;
+    energyChart.update();
+
+    // Clear energy chart data from localStorage
+    localStorage.removeItem('energyReadings');
+    localStorage.removeItem('timeLabels');
+}
+
+
+    </script>
+</body>
+</html>
